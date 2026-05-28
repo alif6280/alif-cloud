@@ -1,24 +1,19 @@
 <div align="center">
 
-<br/>
-
-<h1>☁️ ALIF CLOUD</h1>
-
-<h3>Your Personal Cloud Storage — Beautiful, Fast & Secure</h3>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=☁️%20ALIF%20CLOUD&fontSize=60&fontColor=fff&fontAlignY=38&desc=Your%20Personal%20Cloud%20Storage%20—%20Beautiful,%20Fast%20%26%20Secure&descAlignY=60&descSize=18&animation=fadeIn"/>
 
 <br/>
 
-<img src="https://img.shields.io/badge/Next.js-14-FF6B6B?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
-<img src="https://img.shields.io/badge/TypeScript-5.0-4ECDC4?style=for-the-badge&logo=typescript&logoColor=white"/>
-<img src="https://img.shields.io/badge/Supabase-Backend-45B7D1?style=for-the-badge&logo=supabase&logoColor=white"/>
-<img src="https://img.shields.io/badge/Tailwind_CSS-3.4-96CEB4?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
-<img src="https://img.shields.io/badge/Framer_Motion-11-FFEAA7?style=for-the-badge&logo=framer&logoColor=black"/>
-<img src="https://img.shields.io/badge/Vercel-Live-DDA0DD?style=for-the-badge&logo=vercel&logoColor=white"/>
-<img src="https://img.shields.io/badge/PostgreSQL-Database-F0A500?style=for-the-badge&logo=postgresql&logoColor=white"/>
+<img src="https://img.shields.io/badge/Next.js-14-a78bfa?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
+<img src="https://img.shields.io/badge/TypeScript-5.0-60a5fa?style=for-the-badge&logo=typescript&logoColor=white"/>
+<img src="https://img.shields.io/badge/Supabase-Backend-34d399?style=for-the-badge&logo=supabase&logoColor=white"/>
+<img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
+<img src="https://img.shields.io/badge/Framer_Motion-11-f472b6?style=for-the-badge&logo=framer&logoColor=white"/>
+<img src="https://img.shields.io/badge/Vercel-Live%20🚀-818cf8?style=for-the-badge&logo=vercel&logoColor=white"/>
 
 <br/><br/>
 
-> **Your own private Google Drive — but you own everything, forever.**
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=18&pause=1000&color=A78BFA&center=true&vCenter=true&width=600&lines=Your+own+private+Google+Drive+☁️;But+you+own+everything%2C+forever+🔒;Upload+%7C+Share+%7C+Analyze+%7C+Secure+✨)](https://git.io/typing-svg)
 
 <br/>
 
