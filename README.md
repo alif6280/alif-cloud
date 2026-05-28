@@ -2,13 +2,9 @@
 
 <br/>
 
-```
-    ___    __    _______   ______  __    ____  __  _______ 
-   /   |  / /   /  _/ __| / ____/ / /   / __ \/ / / / __ \
-  / /| | / /    / // /_  / /     / /   / / / / / / / / / /
- / ___ |/ /____/ // __/ / /___  / /___/ /_/ / /_/ / /_/ / 
-/_/  |_/_____/___/_/    \____/ /_____/\____/\____/_____/  
-```
+<h1>☁️ ALIF CLOUD</h1>
+
+<h3>Your Personal Cloud Storage — Beautiful, Fast & Secure</h3>
 
 <br/>
 
@@ -16,11 +12,11 @@
 <img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/>
 <img src="https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white"/>
 <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
-<img src="https://img.shields.io/badge/Vercel-Deploy-000000?style=for-the-badge&logo=vercel&logoColor=white"/>
+<img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white"/>
 
 <br/><br/>
 
-> ### ☁️ Your personal cloud. Beautifully crafted. Infinitely yours.
+> **Your own private Google Drive — but you own everything, forever.**
 
 <br/>
 
@@ -28,17 +24,19 @@
 
 ---
 
-## ✨ What is Alif Cloud?
+## 🌐 Live Demo
 
-**Alif Cloud** is a full-featured, self-hosted personal cloud storage system — built with modern web technologies and designed with a clean, dark-mode-first aesthetic. Upload files, star them, share them, and never worry about losing them again.
+> 🚀 **The app is live and running!**
 
-Think of it as **your own private Google Drive** — but you own everything, forever.
+**[👉 Visit Alif Cloud — Live](https://alifcloud.vercel.app)**
+
+> _(Replace the link above with your actual Vercel URL)_
 
 <br/>
 
 ---
 
-## 🚀 Core Features
+## ✨ Features
 
 | Feature | Description |
 |---|---|
@@ -60,17 +58,15 @@ Think of it as **your own private Google Drive** — but you own everything, for
 ## 🏗️ Tech Stack
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    ALIF CLOUD STACK                 │
-├──────────────────┬──────────────────────────────────┤
-│  Frontend        │  Next.js 14 + TypeScript         │
-│  Styling         │  Tailwind CSS + Framer Motion     │
-│  Backend         │  Supabase (Auth + DB + Storage)   │
-│  Database        │  PostgreSQL (via Supabase)        │
-│  File Storage    │  Supabase Storage                 │
-│  Charts          │  Recharts                         │
-│  File Upload     │  React Dropzone                   │
-│  Deployment      │  Vercel                           │
+┌──────────────────┬──────────────────────────────────┐
+│  Frontend        │  Next.js 14 + TypeScript          │
+│  Styling         │  Tailwind CSS + Framer Motion      │
+│  Backend         │  Supabase (Auth + DB + Storage)    │
+│  Database        │  PostgreSQL (via Supabase)         │
+│  File Storage    │  Supabase Storage                  │
+│  Charts          │  Recharts                          │
+│  File Upload     │  React Dropzone                    │
+│  Deployment      │  Vercel                            │
 └──────────────────┴──────────────────────────────────┘
 ```
 
@@ -85,78 +81,74 @@ alif-cloud/
 ├── src/
 │   ├── app/
 │   │   ├── (auth)/
-│   │   │   ├── login/page.tsx          ← 🔐 Login page
-│   │   │   └── signup/page.tsx         ← 📝 Signup page
+│   │   │   ├── login/page.tsx          ← Login page
+│   │   │   └── signup/page.tsx         ← Signup page
 │   │   ├── (dashboard)/
-│   │   │   ├── files/page.tsx          ← 📁 Main file manager
-│   │   │   ├── starred/page.tsx        ← ⭐ Starred files
-│   │   │   ├── trash/page.tsx          ← 🗑️ Recycle bin
-│   │   │   ├── shared/page.tsx         ← 🔗 Share links
-│   │   │   ├── analytics/page.tsx      ← 📊 Usage charts
-│   │   │   └── settings/page.tsx       ← ⚙️ User settings
-│   │   ├── share/[token]/page.tsx      ← 🌐 Public share page
-│   │   ├── api/download/route.ts       ← 📥 Download API
-│   │   └── layout.tsx                  ← 🧱 Root layout
+│   │   │   ├── files/page.tsx          ← Main file manager
+│   │   │   ├── starred/page.tsx        ← Starred files
+│   │   │   ├── trash/page.tsx          ← Recycle bin
+│   │   │   ├── shared/page.tsx         ← Share links
+│   │   │   ├── analytics/page.tsx      ← Usage charts
+│   │   │   └── settings/page.tsx       ← User settings
+│   │   ├── share/[token]/page.tsx      ← Public share page
+│   │   ├── api/download/route.ts       ← Download API
+│   │   └── layout.tsx
 │   ├── components/
 │   │   ├── layout/
-│   │   │   ├── Sidebar.tsx             ← 🗂️ Navigation sidebar
-│   │   │   └── TopBar.tsx              ← 🔝 Top navigation bar
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── TopBar.tsx
 │   │   └── files/
-│   │       └── FilesClient.tsx         ← 📂 File manager UI
+│   │       └── FilesClient.tsx
 │   └── lib/
-│       ├── supabase/
-│       │   ├── client.ts               ← 🔌 Client-side Supabase
-│       │   └── server.ts               ← 🖥️ Server-side Supabase
-│       ├── utils/index.ts              ← 🛠️ Utility functions
-│       └── types/index.ts              ← 🏷️ TypeScript types
-├── supabase-schema.sql                 ← 🗄️ Database schema
-├── .env.example                        ← 🔑 Environment template
-├── next.config.mjs                     ← ⚙️ Next.js config
-├── tailwind.config.ts                  ← 🎨 Tailwind config
-└── package.json                        ← 📦 Dependencies
+│       ├── supabase/client.ts
+│       ├── supabase/server.ts
+│       ├── utils/index.ts
+│       └── types/index.ts
+├── supabase-schema.sql
+├── .env.example
+├── next.config.mjs
+└── package.json
 ```
 
 <br/>
 
 ---
 
-## ⚡ Quick Setup
+## ⚡ Local Setup
 
-### Step 1 — Clone the repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/alif-cloud.git
+git clone https://github.com/alif6280/alif-cloud.git
 cd alif-cloud
 ```
 
-### Step 2 — Set up Supabase
+### 2. Set up Supabase
 
 1. Go to [supabase.com](https://supabase.com) → **New Project**
 2. Open **SQL Editor** → paste `supabase-schema.sql` → **Run**
 3. Go to **Authentication → Providers** → Enable Google *(optional)*
 4. Go to **Project Settings → API** → Copy your credentials
 
-### Step 3 — Configure environment variables
+### 3. Configure environment variables
 
 ```bash
 cp .env.example .env.local
 ```
-
-Open `.env.local` and fill in your values:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
 ```
 
-### Step 4 — Install & run
+### 4. Install & run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) 🎉
+Open [http://localhost:3000](http://localhost:3000)
 
 <br/>
 
@@ -171,7 +163,7 @@ Then open [http://localhost:3000](http://localhost:3000) 🎉
 4. Add environment variables:
      NEXT_PUBLIC_SUPABASE_URL
      NEXT_PUBLIC_SUPABASE_ANON_KEY
-5. Click Deploy!
+5. Deploy!
 ```
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
@@ -182,7 +174,7 @@ Then open [http://localhost:3000](http://localhost:3000) 🎉
 
 ## 🛡️ Lock Down for Personal Use
 
-Once you've created your account, you can prevent anyone else from signing up:
+Once you've created your account, disable public signups:
 
 ```
 Supabase Dashboard
@@ -191,13 +183,13 @@ Supabase Dashboard
   → Disable "Enable Sign Ups"
 ```
 
-Now only you can log in. Your cloud. Your rules. 🔒
+Now only you can log in. Your cloud. Your rules.
 
 <br/>
 
 ---
 
-## 🔧 Available Scripts
+## 🔧 Scripts
 
 ```bash
 npm run dev       # Start development server
@@ -210,58 +202,9 @@ npm run lint      # Run ESLint
 
 ---
 
-## 📦 Key Dependencies
-
-```json
-{
-  "next": "14.2.15",
-  "@supabase/supabase-js": "^2.45.4",
-  "@supabase/ssr": "^0.5.1",
-  "framer-motion": "^11.11.11",
-  "lucide-react": "^0.454.0",
-  "recharts": "^2.13.0",
-  "react-dropzone": "^14.3.5",
-  "tailwindcss": "^3.4.1",
-  "typescript": "^5"
-}
-```
-
-<br/>
-
----
-
-## 🗄️ Database Schema
-
-The `supabase-schema.sql` file sets up:
-
-- `files` table — stores file metadata (name, size, type, path, owner)
-- `shared_links` table — manages public share tokens with expiry dates
-- Row Level Security (RLS) — ensures users can only access their own files
-- Storage bucket — configures Supabase Storage for file uploads
-
-<br/>
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome! For major changes, please open an issue first to discuss what you'd like to change.
-
-```bash
-# Fork the repo
-git checkout -b feature/amazing-feature
-git commit -m "feat: add amazing feature"
-git push origin feature/amazing-feature
-# Open a Pull Request
-```
-
-<br/>
-
----
-
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+MIT License — open source and free to use.
 
 <br/>
 
@@ -269,7 +212,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-**Built by MD. Montasir Monir Alif**
+Built with ❤️ by **alif6280**
 
 ☁️ **Alif Cloud** — *Your files. Your server. Your rules.*
 
