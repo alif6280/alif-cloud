@@ -8,11 +8,13 @@
 
 <br/>
 
-<img src="https://img.shields.io/badge/Next.js-14-000000?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
-<img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/>
-<img src="https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white"/>
-<img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
-<img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white"/>
+<img src="https://img.shields.io/badge/Next.js-14-FF6B6B?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
+<img src="https://img.shields.io/badge/TypeScript-5.0-4ECDC4?style=for-the-badge&logo=typescript&logoColor=white"/>
+<img src="https://img.shields.io/badge/Supabase-Backend-45B7D1?style=for-the-badge&logo=supabase&logoColor=white"/>
+<img src="https://img.shields.io/badge/Tailwind_CSS-3.4-96CEB4?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
+<img src="https://img.shields.io/badge/Framer_Motion-11-FFEAA7?style=for-the-badge&logo=framer&logoColor=black"/>
+<img src="https://img.shields.io/badge/Vercel-Live-DDA0DD?style=for-the-badge&logo=vercel&logoColor=white"/>
+<img src="https://img.shields.io/badge/PostgreSQL-Database-F0A500?style=for-the-badge&logo=postgresql&logoColor=white"/>
 
 <br/><br/>
 
