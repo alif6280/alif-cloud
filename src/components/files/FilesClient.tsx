@@ -119,12 +119,9 @@ export default function FilesClient({ initialFiles, initialFolders }: Props) {
       setUploads(prev => [...prev, { file, progress: 0, status: "uploading" }]);
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${id}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, {
-        onUploadProgress: ({ loaded, total }) => {
-          const pct = Math.round((loaded / (total ?? 1)) * 100);
-          setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: pct } : u));
-        },
-      });
+      setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 50 } : u));
+const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u));
       if (uploadError) {
         setUploads(prev => prev.map(u => u.file === file ? { ...u, status: "error", error: uploadError.message } : u));
         showToast(`Failed to upload ${file.name}`, "error");
