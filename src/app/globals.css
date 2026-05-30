@@ -1,342 +1,156 @@
-@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@400,500,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --brand: #6366f1;
-  --brand-glow: rgba(99,102,241,0.35);
-  --surface: #0a0a0f;
-  --surface-card: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.06);
-  --text: #f1f5f9;
-  --text-muted: #64748b;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
+* { box-sizing: border-box; }
 
 body {
-  background: var(--surface);
-  color: var(--text);
-  font-family: 'Cabinet Grotesk', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
+  background: #070710;
+  color: #f1f5f9;
+  font-family: 'Space Grotesk', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.7); }
-
-/* Selection */
-::selection { background: rgba(99,102,241,0.3); color: #fff; }
-
-/* Noise texture overlay */
-.file-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(99,102,241,0.05), transparent);
-  opacity: 0;
-  transition: opacity 0.25s;
-  pointer-events: none;
-}
-
-/* Glass card */
+/* ===================== GLASS ===================== */
 .glass {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.025);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.06);
 }
 
-.glass-hover {
-  transition: all 0.3s ease;
-}
-.glass-hover:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(99,102,241,0.3);
-  box-shadow: 0 0 30px rgba(99,102,241,0.15);
-  transform: translateY(-2px);
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #818cf8 0%, #6366f1 40%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-cyan {
-  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 50%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Glow effects */
-.glow { box-shadow: 0 0 20px var(--brand-glow); }
-.glow-text { text-shadow: 0 0 20px rgba(99,102,241,0.5); }
-
-/* Button styles */
-.btn-primary {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  color: white;
-  border: none;
-  padding: 0.625rem 1.5rem;
-  border-radius: 0.625rem;
-  font-weight: 600;
-  font-family: 'Cabinet Grotesk', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: visible;
-}
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.btn-primary:hover::before { opacity: 1; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); }
-.btn-primary:active { transform: translateY(0); }
-
-.btn-ghost {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 0.625rem 1.5rem;
-  border-radius: 0.625rem;
-  font-weight: 500;
-  font-family: 'Cabinet Grotesk', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.btn-ghost:hover {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.12);
-  color: var(--text);
-}
-
-/* Input styles */
-.input-field {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 0.625rem;
-  padding: 0.75rem 1rem 0.75rem 2.5rem; /* ← এইটাই fix */
-  color: var(--text);
-  font-family: 'Cabinet Grotesk', sans-serif;
-  font-size: 0.9rem;
-  width: 100%;
-  transition: all 0.2s ease;
-  outline: none;
-}
-.input-field::placeholder { color: var(--text-muted); }
-.input-field:focus {
-  border-color: rgba(99,102,241,0.5);
-  background: rgba(99,102,241,0.05);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
-}
-
-/* File card */
-.file-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 1rem;
-  padding: 1.25rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  position: relative;
-  overflow: hidden;
-}
-.file-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(99,102,241,0.05), transparent);
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-.file-card:hover::before { opacity: 1; }
-.file-card:hover {
-  border-color: rgba(99,102,241,0.25);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(99,102,241,0.1);
-}
-
-/* Sidebar */
+/* ===================== SIDEBAR ITEMS ===================== */
 .sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem 0.875rem;
-  border-radius: 0.625rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-}
-.sidebar-item:hover {
-  background: rgba(255,255,255,0.04);
-  color: var(--text);
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500
+         hover:text-slate-200 hover:bg-white/[0.04] transition-all cursor-pointer
+         font-medium w-full;
 }
 .sidebar-item.active {
-  background: rgba(99,102,241,0.15);
-  color: #818cf8;
-  border: 1px solid rgba(99,102,241,0.2);
+  @apply text-white bg-white/[0.07] border border-white/[0.06];
 }
 
-/* Progress bar */
+/* ===================== INPUT ===================== */
+.input-field {
+  @apply w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]
+         text-slate-200 placeholder-slate-600 text-sm
+         focus:outline-none focus:border-brand-500/50 focus:bg-white/[0.06]
+         transition-all;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn-primary {
+  @apply px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white
+         font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* ===================== FILE CARDS ===================== */
+.file-card {
+  @apply relative p-4 rounded-2xl border border-white/[0.05] bg-white/[0.02]
+         hover:border-white/[0.1] hover:bg-white/[0.04] cursor-pointer transition-all;
+}
+
+/* ===================== STAT CARD ===================== */
+.stat-card {
+  @apply glass rounded-2xl p-5 border border-white/[0.05];
+}
+
+/* ===================== UPLOAD ZONE ===================== */
+.upload-zone {
+  @apply rounded-2xl border-2 border-dashed border-white/[0.08]
+         bg-white/[0.01] hover:border-brand-500/30 hover:bg-brand-500/[0.02] transition-all;
+}
+
+/* ===================== BADGE ===================== */
+.badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-medium font-mono uppercase tracking-wide;
+}
+.badge-doc   { @apply bg-blue-500/15 text-blue-400; }
+.badge-image { @apply bg-green-500/15 text-green-400; }
+.badge-video { @apply bg-purple-500/15 text-purple-400; }
+.badge-pdf   { @apply bg-red-500/15 text-red-400; }
+.badge-audio { @apply bg-yellow-500/15 text-yellow-400; }
+.badge-archive { @apply bg-orange-500/15 text-orange-400; }
+.badge-other { @apply bg-slate-500/15 text-slate-400; }
+
+/* ===================== PROGRESS ===================== */
 .progress-bar {
-  height: 6px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 99px;
-  overflow: hidden;
+  @apply h-1.5 rounded-full bg-white/[0.06] overflow-hidden;
 }
 .progress-fill {
-  height: 100%;
+  @apply h-full rounded-full transition-all duration-700;
   background: linear-gradient(90deg, #6366f1, #818cf8, #a78bfa);
-  border-radius: 99px;
-  transition: width 0.5s ease;
-  background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
 }
 
-/* Upload zone */
-.upload-zone {
-  border: 2px dashed rgba(99,102,241,0.3);
-  border-radius: 1.25rem;
-  padding: 3rem 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(99,102,241,0.03);
-  position: relative;
-  overflow: hidden;
-}
-.upload-zone:hover, .upload-zone.drag-over {
-  border-color: rgba(99,102,241,0.6);
-  background: rgba(99,102,241,0.08);
-  box-shadow: 0 0 40px rgba(99,102,241,0.1);
-}
-
-/* Badge */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 99px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.badge-pdf { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
-.badge-image { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
-.badge-video { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.2); }
-.badge-doc { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
-.badge-other { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
-
-/* Stat card */
-.stat-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.15;
-}
-
-/* Toast */
+/* ===================== TOAST ===================== */
 .toast {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 9000;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.25rem;
-  border-radius: 0.875rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  backdrop-filter: blur(20px);
-  border: 1px solid;
-  min-width: 280px;
-  animation: slideUp 0.3s ease-out;
+  @apply fixed bottom-6 left-1/2 -translate-x-1/2 z-50
+         px-4 py-2.5 rounded-2xl text-sm font-medium
+         shadow-2xl backdrop-blur-xl border
+         animate-slide-up whitespace-nowrap;
 }
-.toast-success { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.25); color: #34d399; }
-.toast-error { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); color: #f87171; }
-.toast-info { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.25); color: #818cf8; }
-
-/* Loading spinner */
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(99,102,241,0.2);
-  border-top-color: #6366f1;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+.toast-success {
+  @apply bg-green-500/20 border-green-500/30 text-green-300;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Mesh background */
-.mesh-bg {
-  background:
-    radial-gradient(at 20% 20%, rgba(99,102,241,0.12) 0px, transparent 50%),
-    radial-gradient(at 80% 10%, rgba(167,139,250,0.08) 0px, transparent 50%),
-    radial-gradient(at 60% 80%, rgba(34,211,238,0.06) 0px, transparent 50%),
-    radial-gradient(at 10% 80%, rgba(99,102,241,0.06) 0px, transparent 50%);
+.toast-error {
+  @apply bg-red-500/20 border-red-500/30 text-red-300;
 }
 
-/* Animated border */
-@keyframes borderRotate {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.animated-border {
-  position: relative;
-}
-.animated-border::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #6366f1, #a78bfa, #22d3ee, #6366f1);
-  background-size: 300% 300%;
-  animation: borderRotate 4s ease infinite;
-  z-index: -1;
+/* ===================== GLOW ===================== */
+.glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
 }
 
-/* Orbit animation for login page */
-@keyframes orbit {
-  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+/* ===================== ANIMATIONS ===================== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.orbit-1 { animation: orbit 8s linear infinite; }
-.orbit-2 { animation: orbit 12s linear infinite reverse; }
-.orbit-3 { animation: orbit 16s linear infinite; }
+@keyframes slide-up {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.animate-fade-in  { animation: fade-in 0.3s ease forwards; }
+.animate-slide-up { animation: slide-up 0.35s ease forwards; }
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* ===================== FONT DISPLAY ===================== */
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+/* ===================== GRADIENT TEXT ===================== */
+.gradient-text {
+  background: linear-gradient(135deg, #818cf8, #6366f1, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===================== MOBILE PADDING HELPER ===================== */
+/* Pages inside dashboard get proper top padding on mobile
+   because the hamburger button overlaps */
+@media (max-width: 1023px) {
+  main > * {
+    padding-top: 0 !important;
+  }
+}
+
+/* ===================== RESPONSIVE GRID HELPERS ===================== */
+@media (max-width: 640px) {
+  .file-card {
+    @apply p-3;
+  }
+  .stat-card {
+    @apply p-4;
+  }
+}

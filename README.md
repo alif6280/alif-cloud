@@ -49,7 +49,30 @@
 | 🔒 **Secure Auth** | Email login + optional Google OAuth via Supabase |
 | 🌙 **Dark Mode** | Beautiful dark-first design — easy on the eyes |
 | 📱 **Responsive** | Fully functional on desktop, tablet, and mobile |
-| 🛡️ **Private Mode** | Lock signups after setup — only you can access it |
+| 🛡️ **Admin Panel** | Full admin control — manage users, storage, and access |
+| 📧 **Email Whitelist** | Restrict signups to allowed emails only |
+
+<br/>
+
+---
+
+## 🛡️ Admin Panel
+
+Alif Cloud includes a powerful built-in Admin Panel at `/admin`.
+
+| Feature | Description |
+|---|---|
+| 📊 **Overview** | Total users, files, storage, and allowed emails at a glance |
+| 👥 **User Management** | View all users, block/unblock, promote/demote admin, delete |
+| 💾 **Storage Quota** | Edit per-user storage quota directly from the panel |
+| 📧 **Allowed Emails** | Whitelist emails — only listed addresses can sign up |
+| 🔐 **Secure Access** | Admin routes protected by server-side role verification |
+
+### How the Email Whitelist Works
+
+- **List is empty** → Anyone can sign up freely
+- **List has emails** → Only those exact emails can sign up
+- **Email not in list** → Signup is blocked with an error
 
 <br/>
 
@@ -81,17 +104,23 @@ alif-cloud/
 ├── src/
 │   ├── app/
 │   │   ├── (auth)/
-│   │   │   ├── login/page.tsx          ← Login page
-│   │   │   └── signup/page.tsx         ← Signup page
+│   │   │   ├── login/page.tsx              ← Login page
+│   │   │   └── signup/page.tsx             ← Signup page (whitelist checked)
 │   │   ├── (dashboard)/
-│   │   │   ├── files/page.tsx          ← Main file manager
-│   │   │   ├── starred/page.tsx        ← Starred files
-│   │   │   ├── trash/page.tsx          ← Recycle bin
-│   │   │   ├── shared/page.tsx         ← Share links
-│   │   │   ├── analytics/page.tsx      ← Usage charts
-│   │   │   └── settings/page.tsx       ← User settings
-│   │   ├── share/[token]/page.tsx      ← Public share page
-│   │   ├── api/download/route.ts       ← Download API
+│   │   │   ├── files/page.tsx              ← Main file manager
+│   │   │   ├── starred/page.tsx            ← Starred files
+│   │   │   ├── trash/page.tsx              ← Recycle bin
+│   │   │   ├── shared/page.tsx             ← Share links
+│   │   │   ├── analytics/page.tsx          ← Usage charts
+│   │   │   └── settings/page.tsx           ← User settings
+│   │   ├── admin/
+│   │   │   ├── page.tsx                    ← Admin overview
+│   │   │   ├── users/page.tsx              ← User management
+│   │   │   └── emails/page.tsx             ← Email whitelist
+│   │   ├── api/
+│   │   │   ├── admin/users/route.ts        ← Admin user actions API
+│   │   │   └── download/route.ts           ← File download API
+│   │   ├── share/[token]/page.tsx          ← Public share page
 │   │   └── layout.tsx
 │   ├── components/
 │   │   ├── layout/
@@ -101,9 +130,10 @@ alif-cloud/
 │   │       └── FilesClient.tsx
 │   └── lib/
 │       ├── supabase/client.ts
-│       ├── supabase/server.ts
+│       ├── supabase/server.ts              ← createClient + createAdminClient
 │       ├── utils/index.ts
 │       └── types/index.ts
+├── src/middleware.ts                       ← Admin route protection
 ├── supabase-schema.sql
 ├── .env.example
 ├── next.config.mjs
@@ -139,7 +169,11 @@ cp .env.example .env.local
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+> ⚠️ `SUPABASE_SERVICE_ROLE_KEY` is required for the Admin Panel to work.
+> Find it at: Supabase Dashboard → Settings → API → `service_role`
 
 ### 4. Install & run
 
@@ -163,6 +197,7 @@ Open [http://localhost:3000](http://localhost:3000)
 4. Add environment variables:
      NEXT_PUBLIC_SUPABASE_URL
      NEXT_PUBLIC_SUPABASE_ANON_KEY
+     SUPABASE_SERVICE_ROLE_KEY
 5. Deploy!
 ```
 
@@ -172,18 +207,25 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🛡️ Lock Down for Personal Use
+## 🗄️ Supabase RLS Policies
 
-Once you've created your account, disable public signups:
+For the admin panel and email whitelist to work correctly, run these policies in your Supabase SQL Editor:
 
+```sql
+-- Allow anyone to read allowed_emails (for signup check)
+CREATE POLICY "Anyone can check allowed emails"
+  ON allowed_emails FOR SELECT USING (true);
+
+-- Only admins can manage allowed_emails
+CREATE POLICY "Admins manage allowed emails"
+  ON allowed_emails FOR ALL
+  USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  )
+  WITH CHECK (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
 ```
-Supabase Dashboard
-  → Authentication
-  → Settings
-  → Disable "Enable Sign Ups"
-```
-
-Now only you can log in. Your cloud. Your rules.
 
 <br/>
 
