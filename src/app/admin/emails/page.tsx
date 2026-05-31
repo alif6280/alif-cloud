@@ -133,8 +133,7 @@ export default function AdminEmailsPage() {
       <div className="flex gap-2 p-3 rounded-xl bg-blue-500/5 border border-blue-500/15">
         <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-slate-500 leading-relaxed">
-          এই whitelist এ যে emails থাকবে শুধু তারাই sign up করতে পারবে।
-          List খালি থাকলে সবাই sign up করতে পারবে।
+          Only the emails that are in this whitelist will be able to sign up. If the list is empty, everyone will be able to sign up.
         </p>
       </div>
 
