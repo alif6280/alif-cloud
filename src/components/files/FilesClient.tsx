@@ -6,6 +6,7 @@ import {
   Upload, Grid3X3, List, Search,
   Star, Trash2, Download,
   Share2, Loader2, CloudUpload, X,
+  Files, HardDrive, ArrowDownToLine, TrendingUp,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { formatBytes, formatDate, getFileType, getFileColor, generateToken, STORAGE_BUCKET, MAX_FILE_SIZE } from "@/lib/utils";
@@ -14,6 +15,7 @@ import type { StorageFile, Folder as FolderType, UploadProgress } from "@/lib/ty
 interface Props {
   initialFiles: StorageFile[];
   initialFolders: FolderType[];
+  storageUsed?: number;
 }
 
 const FILE_ICONS: Record<string, string> = {
@@ -21,7 +23,19 @@ const FILE_ICONS: Record<string, string> = {
   audio: "🎵", archive: "📦", other: "📎",
 };
 
-export default function FilesClient({ initialFiles, initialFolders }: Props) {
+const TYPE_GLOW: Record<string, string> = {
+  pdf:     "#ef4444",
+  image:   "#22c55e",
+  video:   "#a855f7",
+  doc:     "#3b82f6",
+  audio:   "#f59e0b",
+  archive: "#f97316",
+  other:   "#64748b",
+};
+
+type TabType = "all" | "image" | "doc" | "video";
+
+export default function FilesClient({ initialFiles, initialFolders, storageUsed = 0 }: Props) {
   const router = useRouter();
   const [files, setFiles] = useState<StorageFile[]>(initialFiles);
   const [folders] = useState<FolderType[]>(initialFolders);
@@ -29,6 +43,7 @@ export default function FilesClient({ initialFiles, initialFolders }: Props) {
   const [search, setSearch] = useState("");
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" | "info" } | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("all");
 
   // ── Preview state ──────────────────────────────────────────────────────────
   const [previewFile, setPreviewFile] = useState<StorageFile | null>(null);
@@ -120,8 +135,8 @@ export default function FilesClient({ initialFiles, initialFolders }: Props) {
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${id}.${ext}`;
       setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 50 } : u));
-const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
-setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u));
+      const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+      setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u));
       if (uploadError) {
         setUploads(prev => prev.map(u => u.file === file ? { ...u, status: "error", error: uploadError.message } : u));
         showToast(`Failed to upload ${file.name}`, "error");
@@ -148,26 +163,23 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, noClick: true });
 
   // ── File actions ───────────────────────────────────────────────────────────
-  // FIX: Use download: filename param to force Content-Disposition: attachment
-  // and window.open() instead of anchor click for reliability
   async function downloadFile(file: StorageFile) {
-  try {
-    showToast("Preparing download...", "info");
-    const url = `/api/download?path=${encodeURIComponent(file.storage_path)}&name=${encodeURIComponent(file.original_name)}`;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.original_name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    const supabase = createClient();
-    await supabase.from("files").update({ download_count: file.download_count + 1 }).eq("id", file.id);
-    showToast(`Downloading ${file.name}`);
-  } catch (err: any) {
-    showToast(err?.message ?? "Download failed", "error");
+    try {
+      showToast("Preparing download...", "info");
+      const url = `/api/download?path=${encodeURIComponent(file.storage_path)}&name=${encodeURIComponent(file.original_name)}`;
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.original_name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      const supabase = createClient();
+      await supabase.from("files").update({ download_count: file.download_count + 1 }).eq("id", file.id);
+      showToast(`Downloading ${file.name}`);
+    } catch (err: any) {
+      showToast(err?.message ?? "Download failed", "error");
+    }
   }
-}
 
   async function toggleStar(file: StorageFile) {
     const supabase = createClient();
@@ -198,14 +210,33 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
     showToast("Share link copied!");
   }
 
-  const filtered = files
+  // ── Filtering ──────────────────────────────────────────────────────────────
+  const tabFilteredFiles = files.filter(f => {
+    if (activeTab === "all") return true;
+    if (activeTab === "image") return f.file_type === "image";
+    if (activeTab === "doc") return f.file_type === "doc" || f.file_type === "pdf";
+    if (activeTab === "video") return f.file_type === "video";
+    return true;
+  });
+
+  const filtered = tabFilteredFiles
     .filter(f => f.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   const allSelected = selected.size > 0 && selected.size === filtered.length;
   const someSelected = selected.size > 0;
 
-  // ── PDF Preview renderer ───────────────────────────────────────────────────
+  // ── Stats ──────────────────────────────────────────────────────────────────
+  const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+  const totalDownloads = files.reduce((sum, f) => sum + (f.download_count || 0), 0);
+  const thisWeek = files.filter(f => {
+    const created = new Date(f.created_at);
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    return created >= weekAgo;
+  }).length;
+
+  // ── Preview renderer ───────────────────────────────────────────────────────
   function renderPreviewBody() {
     if (previewLoading) {
       return <Loader2 className="w-10 h-10 text-brand-400 animate-spin" />;
@@ -216,82 +247,46 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
 
     switch (previewFile?.file_type) {
       case "pdf":
-        // FIX: Use <object> + <embed> instead of <iframe> to avoid browser CSP blocking
         return (
-          <object
-            data={previewUrl}
-            type="application/pdf"
-            className="w-full h-full"
-          >
-            <embed
-              src={previewUrl}
-              type="application/pdf"
-              className="w-full h-full"
-            />
-            {/* Fallback when both object and embed are blocked */}
+          <object data={previewUrl} type="application/pdf" className="w-full h-full">
+            <embed src={previewUrl} type="application/pdf" className="w-full h-full" />
             <div className="flex flex-col items-center gap-4 p-8 text-center">
               <div className="text-6xl">📄</div>
               <p className="text-slate-300 font-medium">{previewFile.name}</p>
-              <p className="text-slate-500 text-sm">
-                Your browser is blocking inline PDF preview.
-              </p>
+              <p className="text-slate-500 text-sm">Your browser is blocking inline PDF preview.</p>
               <div className="flex gap-3">
-                <a
-                  href={previewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary text-sm py-2 px-4 flex items-center gap-2"
-                >
+                <a href={previewUrl} target="_blank" rel="noopener noreferrer"
+                  className="btn-primary text-sm py-2 px-4 flex items-center gap-2">
                   Open in new tab
                 </a>
-                <button
-                  onClick={() => downloadFile(previewFile)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] text-slate-300 hover:bg-white/[0.10] transition-colors text-sm"
-                >
+                <button onClick={() => downloadFile(previewFile)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/[0.06] text-slate-700 hover:bg-black/[0.10] transition-colors text-sm">
                   <Download className="w-4 h-4" /> Download
                 </button>
               </div>
             </div>
           </object>
         );
-
       case "image":
-        return (
-          <img
-            src={previewUrl}
-            alt={previewFile?.name}
-            className="max-w-full max-h-full object-contain"
-          />
-        );
-
+        return <img src={previewUrl} alt={previewFile?.name} className="max-w-full max-h-full object-contain" />;
       case "video":
-        return (
-          <video
-            src={previewUrl}
-            controls
-            className="max-w-full max-h-full"
-          />
-        );
-
+        return <video src={previewUrl} controls className="max-w-full max-h-full" />;
       case "audio":
         return (
           <div className="flex flex-col items-center gap-4">
             <div className="text-6xl">🎵</div>
-            <p className="text-slate-300 font-medium">{previewFile?.name}</p>
+            <p className="text-slate-700 font-medium">{previewFile?.name}</p>
             <audio src={previewUrl} controls className="w-80" />
           </div>
         );
-
       default:
         return (
           <div className="flex flex-col items-center gap-4 text-center p-8">
             <div className="text-6xl">{FILE_ICONS[previewFile?.file_type ?? "other"]}</div>
-            <p className="text-slate-300 font-medium">{previewFile?.name}</p>
+            <p className="text-slate-700 font-medium">{previewFile?.name}</p>
             <p className="text-slate-500 text-sm">Preview not available for this file type</p>
-            <button
-              onClick={() => previewFile && downloadFile(previewFile)}
-              className="btn-primary text-sm py-2 px-4 flex items-center gap-2"
-            >
+            <button onClick={() => previewFile && downloadFile(previewFile)}
+              className="btn-primary text-sm py-2 px-4 flex items-center gap-2">
               <Download className="w-4 h-4" /> Download to view
             </button>
           </div>
@@ -300,18 +295,18 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
   }
 
   return (
-    <div className="h-full flex flex-col relative">
+    <div className="relative">
 
       {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-display font-bold text-white">My Files</h1>
-          <p className="text-slate-600 text-sm mt-0.5">{files.length} files</p>
+          <h1 className="text-2xl font-display font-bold text-[#0a0a0a]">My Files</h1>
+          <p className="text-[#aaa] text-sm mt-0.5">{files.length} files · {formatBytes(totalSize)} used</p>
         </div>
         <div className="flex items-center gap-2">
           {someSelected && (
             <button onClick={deleteSelected}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all text-sm font-medium">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 hover:bg-red-500/20 transition-all text-sm font-medium">
               <Trash2 className="w-4 h-4" />
               Delete {selected.size} selected
             </button>
@@ -324,12 +319,53 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
         </div>
       </div>
 
+      {/* ── Stat Cards ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
+        {[
+          { icon: Files,          value: files.length,           label: "Total Files", color: "#6366f1" },
+          { icon: HardDrive,      value: formatBytes(totalSize),  label: "Used",        color: "#06b6d4" },
+          { icon: ArrowDownToLine,value: totalDownloads,          label: "Downloads",   color: "#22c55e" },
+          { icon: TrendingUp,     value: thisWeek,                label: "This Week",   color: "#f59e0b" },
+        ].map(({ icon: Icon, value, label, color }) => (
+          <div key={label} className="bg-white py-3 px-3.5 transition-transform hover:-translate-y-0.5"
+            style={{ borderRadius: "0 10px 10px 0", border: "0.5px solid rgba(0,0,0,0.07)", borderLeft: `2px solid ${color}`, boxShadow: `-3px 0 12px ${color}40, 0 4px 16px ${color}14` }}>
+            <div className="text-lg font-bold text-[#0a0a0a] leading-none mb-1.5">{value}</div>
+            <div className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color }}>
+              <Icon className="w-3 h-3" />
+              {label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Tabs ── */}
+      <div className="flex gap-1 mb-4">
+        {([
+          { key: "all", label: "All" },
+          { key: "image", label: "Images" },
+          { key: "doc", label: "Documents" },
+          { key: "video", label: "Videos" },
+        ] as { key: TabType; label: string }[]).map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === tab.key
+                ? "bg-[#0a0a0a] text-white"
+                : "text-[#aaa] hover:text-[#555]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* ── Toolbar ── */}
-      <div className="flex items-center gap-3 mb-5 flex-shrink-0">
+      <div className="flex items-center gap-3 mb-5">
         {filtered.length > 0 && (
           <button onClick={selectAll}
-            className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0">
-            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${allSelected ? "bg-brand-600 border-brand-500" : someSelected ? "bg-brand-600/50 border-brand-500/50" : "border-white/20 bg-transparent"}`}>
+            className="flex items-center gap-2 text-xs text-[#aaa] hover:text-[#555] transition-colors">
+            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${allSelected ? "bg-[#0a0a0a] border-[#0a0a0a]" : someSelected ? "bg-[#444] border-[#444]" : "border-black/20 bg-transparent"}`}>
               {allSelected && <span className="text-white text-[10px]">✓</span>}
               {!allSelected && someSelected && <span className="text-white text-[10px]">–</span>}
             </div>
@@ -338,22 +374,22 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
         )}
 
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none z-10" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#aaa] pointer-events-none z-10" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search files..."
-            className="input-field py-2 text-sm w-full"
+            className="w-full px-3 py-2 rounded-xl bg-[#f5f5f5] border border-black/[0.08] text-[#333] placeholder-[#aaa] text-sm focus:outline-none focus:border-black/20 transition-all"
             style={{ paddingLeft: "2.5rem" }}
           />
         </div>
-        <div className="flex rounded-lg border border-white/[0.06] overflow-hidden flex-shrink-0">
+        <div className="flex rounded-lg border border-black/[0.08] overflow-hidden">
           <button onClick={() => setView("grid")}
-            className={`p-2 transition-colors ${view === "grid" ? "bg-brand-600/20 text-brand-400" : "text-slate-600 hover:text-slate-400 bg-transparent"}`}>
+            className={`p-2 transition-colors ${view === "grid" ? "bg-[#0a0a0a] text-white" : "text-[#aaa] hover:text-[#555] bg-transparent"}`}>
             <Grid3X3 className="w-4 h-4" />
           </button>
           <button onClick={() => setView("list")}
-            className={`p-2 transition-colors ${view === "list" ? "bg-brand-600/20 text-brand-400" : "text-slate-600 hover:text-slate-400 bg-transparent"}`}>
+            className={`p-2 transition-colors ${view === "list" ? "bg-[#0a0a0a] text-white" : "text-[#aaa] hover:text-[#555] bg-transparent"}`}>
             <List className="w-4 h-4" />
           </button>
         </div>
@@ -361,113 +397,105 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
 
       {/* ── Upload progress ── */}
       {uploads.length > 0 && (
-        <div className="mb-4 space-y-2 flex-shrink-0">
+        <div className="mb-4 space-y-2">
           {uploads.map((u, i) => (
-            <div key={i} className="glass rounded-xl p-3 flex items-center gap-3">
+            <div key={i} className="bg-[#fafafa] border border-black/[0.07] rounded-xl p-3 flex items-center gap-3">
               <div className="text-xl">{FILE_ICONS[getFileType(u.file.type)]}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300 truncate">{u.file.name}</span>
-                  <span className={u.status === "error" ? "text-red-400" : "text-brand-400"}>{u.status === "error" ? "Error" : `${u.progress}%`}</span>
+                  <span className="text-[#333] truncate">{u.file.name}</span>
+                  <span className={u.status === "error" ? "text-red-500" : "text-[#555]"}>{u.status === "error" ? "Error" : `${u.progress}%`}</span>
                 </div>
                 <div className="progress-bar">
                   <div className="progress-fill" style={{ width: `${u.progress}%`, background: u.status === "error" ? "#ef4444" : undefined }} />
                 </div>
               </div>
-              {u.status === "uploading" && <Loader2 className="w-4 h-4 text-brand-400 animate-spin flex-shrink-0" />}
-              {u.status === "done" && <span className="text-green-400 text-lg">✓</span>}
+              {u.status === "uploading" && <Loader2 className="w-4 h-4 text-[#555] animate-spin" />}
+              {u.status === "done" && <span className="text-green-600 text-lg">✓</span>}
             </div>
           ))}
         </div>
       )}
 
-      {/* ── Empty state ── */}
-      {filtered.length === 0 && uploads.length === 0 && (
-        <div {...getRootProps()} className="flex-1 flex flex-col items-center justify-center upload-zone mx-0 cursor-pointer">
-          <input {...getInputProps()} />
-          <CloudUpload className="w-14 h-14 text-brand-500/40 mb-4" />
-          <p className="text-lg font-display font-semibold text-slate-400 mb-1">
-            {search ? "No files found" : "No files yet"}
-          </p>
-          <p className="text-slate-600 text-sm text-center max-w-xs">
-            {search ? "Try a different search term" : "Drag & drop files here or click Upload to get started"}
-          </p>
-          {isDragActive && (
-            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-2xl border-2 border-brand-500/60 bg-brand-950/80 backdrop-blur-sm">
-              <CloudUpload className="w-16 h-16 text-brand-400 animate-bounce mb-3" />
-              <p className="text-xl font-display font-bold text-brand-300">Drop files here</p>
-            </div>
-          )}
+      {/* ── Section title ── */}
+      {filtered.length > 0 && (
+        <div className="text-[11px] font-semibold text-[#aaa] uppercase tracking-widest mb-3">
+          Recent Files
         </div>
       )}
 
       {/* ── Grid view ── */}
       {view === "grid" && filtered.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-y-auto pb-4">
-          {filtered.map(file => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 pb-4">
+          {filtered.map(file => {
+            const glowColor = TYPE_GLOW[file.file_type] ?? TYPE_GLOW.other;
+            return (
             <div
               key={file.id}
               onClick={() => openPreview(file)}
-              className={`file-card group cursor-pointer relative ${selected.has(file.id) ? "border-brand-500/50 bg-brand-600/10" : ""}`}
+              className={`group cursor-pointer relative bg-white transition-all hover:-translate-y-0.5 ${selected.has(file.id) ? "bg-[#f5f5f5]" : ""}`}
+              style={{ borderRadius: 12, border: `0.5px solid rgba(0,0,0,0.07)`, borderLeft: `2px solid ${glowColor}`, boxShadow: `-3px 0 10px ${glowColor}33, 0 4px 14px ${glowColor}12`, padding: "12px" }}
             >
               <div
                 onClick={e => toggleSelect(file.id, e)}
                 className={`absolute top-2 left-2 z-10 w-5 h-5 rounded border flex items-center justify-center transition-all
                   ${selected.has(file.id)
-                    ? "bg-brand-600 border-brand-500 opacity-100"
-                    : "border-white/20 bg-black/40 opacity-0 group-hover:opacity-100"}`}
+                    ? "bg-[#0a0a0a] border-[#0a0a0a] opacity-100"
+                    : "border-black/20 bg-white/80 opacity-0 group-hover:opacity-100"}`}
               >
                 {selected.has(file.id) && <span className="text-white text-[10px]">✓</span>}
               </div>
 
               <div className="flex items-center justify-center h-14 mb-3">
-                <div className="text-4xl" style={{ filter: `drop-shadow(0 0 8px ${getFileColor(file.file_type)}50)` }}>
+                <div className="text-4xl">
                   {FILE_ICONS[file.file_type]}
                 </div>
               </div>
-              <p className="text-xs font-medium text-slate-300 truncate mb-1" title={file.name}>{file.name}</p>
-              <p className="text-[10px] text-slate-600">{formatBytes(file.size)}</p>
+              <p className="text-xs font-medium text-[#333] truncate mb-1" title={file.name}>{file.name}</p>
+              <p className="text-[10px] text-[#aaa] font-mono">{formatBytes(file.size)}</p>
+              <span className={`badge badge-${file.file_type} mt-2`}>{file.file_type}</span>
 
               <div className="flex items-center justify-between mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button type="button" onClick={e => { e.stopPropagation(); toggleStar(file); }}
-                  className={`p-1 rounded transition-colors ${file.is_starred ? "text-yellow-400" : "text-slate-600 hover:text-yellow-400"}`}>
+                  className={`p-1 rounded transition-colors ${file.is_starred ? "text-yellow-500" : "text-[#ccc] hover:text-yellow-500"}`}>
                   <Star className="w-3.5 h-3.5" fill={file.is_starred ? "currentColor" : "none"} />
                 </button>
                 <div className="flex gap-1">
                   <button type="button" onClick={e => { e.stopPropagation(); downloadFile(file); }}
-                    className="p-1 rounded text-slate-600 hover:text-brand-400 transition-colors">
+                    className="p-1 rounded text-[#ccc] hover:text-[#0a0a0a] transition-colors">
                     <Download className="w-3.5 h-3.5" />
                   </button>
                   <button type="button" onClick={e => { e.stopPropagation(); shareFile(file); }}
-                    className="p-1 rounded text-slate-600 hover:text-green-400 transition-colors">
+                    className="p-1 rounded text-[#ccc] hover:text-green-600 transition-colors">
                     <Share2 className="w-3.5 h-3.5" />
                   </button>
                   <button type="button" onClick={e => { e.stopPropagation(); moveToTrash(file); }}
-                    className="p-1 rounded text-slate-600 hover:text-red-400 transition-colors">
+                    className="p-1 rounded text-[#ccc] hover:text-red-500 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* ── List view ── */}
       {view === "list" && filtered.length > 0 && (
-        <div className="overflow-y-auto rounded-xl border border-white/[0.05] pb-4">
+        <div className="rounded-xl border border-black/[0.07] pb-4">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/[0.05]">
+              <tr className="border-b border-black/[0.07] bg-[#fafafa]">
                 <th className="px-4 py-3 w-8">
                   <div onClick={selectAll}
-                    className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer transition-all ${allSelected ? "bg-brand-600 border-brand-500" : "border-white/20"}`}>
+                    className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer transition-all ${allSelected ? "bg-[#0a0a0a] border-[#0a0a0a]" : "border-black/20"}`}>
                     {allSelected && <span className="text-white text-[10px]">✓</span>}
                     {!allSelected && someSelected && <span className="text-white text-[10px]">–</span>}
                   </div>
                 </th>
                 {["Name", "Size", "Type", "Date", ""].map(h => (
-                  <th key={h} className="text-left text-xs text-slate-600 font-medium px-4 py-3">{h}</th>
+                  <th key={h} className="text-left text-xs text-[#aaa] font-semibold px-4 py-3">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -475,31 +503,31 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
               {filtered.map(file => (
                 <tr key={file.id}
                   onClick={() => openPreview(file)}
-                  className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors group cursor-pointer ${selected.has(file.id) ? "bg-brand-600/10" : ""}`}>
+                  className={`border-b border-black/[0.04] hover:bg-[#fafafa] transition-colors group cursor-pointer ${selected.has(file.id) ? "bg-[#f5f5f5]" : ""}`}>
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                     <div onClick={e => toggleSelect(file.id, e)}
-                      className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer transition-all ${selected.has(file.id) ? "bg-brand-600 border-brand-500" : "border-white/20"}`}>
+                      className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer transition-all ${selected.has(file.id) ? "bg-[#0a0a0a] border-[#0a0a0a]" : "border-black/20"}`}>
                       {selected.has(file.id) && <span className="text-white text-[10px]">✓</span>}
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{FILE_ICONS[file.file_type]}</span>
-                      <span className="text-sm text-slate-300 font-medium truncate max-w-[200px]">{file.name}</span>
-                      {file.is_starred && <Star className="w-3 h-3 text-yellow-400 fill-current flex-shrink-0" />}
+                      <span className="text-sm text-[#333] font-medium truncate max-w-[200px]">{file.name}</span>
+                      {file.is_starred && <Star className="w-3 h-3 text-yellow-500 fill-current" />}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs text-slate-600">{formatBytes(file.size)}</td>
+                  <td className="px-4 py-3 text-xs text-[#aaa] font-mono">{formatBytes(file.size)}</td>
                   <td className="px-4 py-3">
                     <span className={`badge badge-${file.file_type}`}>{file.file_type}</span>
                   </td>
-                  <td className="px-4 py-3 text-xs text-slate-600">{formatDate(file.created_at)}</td>
+                  <td className="px-4 py-3 text-xs text-[#aaa]">{formatDate(file.created_at)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
-                      <button type="button" onClick={e => { e.stopPropagation(); downloadFile(file); }} className="p-1.5 rounded-lg hover:bg-brand-500/10 text-slate-600 hover:text-brand-400 transition-colors"><Download className="w-3.5 h-3.5" /></button>
-                      <button type="button" onClick={e => { e.stopPropagation(); shareFile(file); }} className="p-1.5 rounded-lg hover:bg-green-500/10 text-slate-600 hover:text-green-400 transition-colors"><Share2 className="w-3.5 h-3.5" /></button>
-                      <button type="button" onClick={e => { e.stopPropagation(); toggleStar(file); }} className={`p-1.5 rounded-lg transition-colors ${file.is_starred ? "text-yellow-400" : "text-slate-600 hover:text-yellow-400 hover:bg-yellow-500/10"}`}><Star className="w-3.5 h-3.5" fill={file.is_starred ? "currentColor" : "none"} /></button>
-                      <button type="button" onClick={e => { e.stopPropagation(); moveToTrash(file); }} className="p-1.5 rounded-lg hover:bg-red-500/10 text-slate-600 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button type="button" onClick={e => { e.stopPropagation(); downloadFile(file); }} className="p-1.5 rounded-lg hover:bg-black/[0.06] text-[#aaa] hover:text-[#0a0a0a] transition-colors"><Download className="w-3.5 h-3.5" /></button>
+                      <button type="button" onClick={e => { e.stopPropagation(); shareFile(file); }} className="p-1.5 rounded-lg hover:bg-green-500/10 text-[#aaa] hover:text-green-600 transition-colors"><Share2 className="w-3.5 h-3.5" /></button>
+                      <button type="button" onClick={e => { e.stopPropagation(); toggleStar(file); }} className={`p-1.5 rounded-lg transition-colors ${file.is_starred ? "text-yellow-500" : "text-[#aaa] hover:text-yellow-500 hover:bg-yellow-500/10"}`}><Star className="w-3.5 h-3.5" fill={file.is_starred ? "currentColor" : "none"} /></button>
+                      <button type="button" onClick={e => { e.stopPropagation(); moveToTrash(file); }} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#aaa] hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </td>
                 </tr>
@@ -509,37 +537,60 @@ setUploads(prev => prev.map(u => u.file === file ? { ...u, progress: 100 } : u))
         </div>
       )}
 
-      {/* ── PDF / File Preview Modal ── */}
+      {/* ── Empty state ── */}
+      {filtered.length === 0 && uploads.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <CloudUpload className="w-14 h-14 text-[#ccc] mb-4" />
+          <p className="text-lg font-display font-semibold text-[#aaa] mb-1">
+            {search ? "No files found" : "No files yet"}
+          </p>
+          <p className="text-[#bbb] text-sm max-w-xs">
+            {search ? "Try a different search term" : "Upload files to get started"}
+          </p>
+        </div>
+      )}
+
+      {/* ── Drop zone (always at bottom) ── */}
+      <div {...getRootProps()} className="mt-4">
+        <input {...getInputProps()} />
+        <div className={`upload-zone p-6 flex flex-col items-center gap-2 cursor-pointer ${isDragActive ? "border-[#0a0a0a]/40 bg-[#f0f0f0]" : ""}`}>
+          <CloudUpload className="w-7 h-7 text-[#ccc]" />
+          <p className="text-sm font-semibold text-[#aaa]">Drop files here or click to browse</p>
+          <label className="mt-2 px-5 py-2 rounded-xl bg-[#0a0a0a] text-white text-sm font-semibold cursor-pointer hover:bg-[#222] transition-colors">
+            Upload Files
+            <input type="file" multiple className="hidden" onChange={e => e.target.files && onDrop(Array.from(e.target.files))} />
+          </label>
+        </div>
+      </div>
+
+      {/* ── Preview Modal ── */}
       {previewFile && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center" onClick={closePreview}>
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="relative z-10 flex flex-col w-[90vw] h-[90vh] max-w-5xl glass rounded-2xl border border-white/[0.08] overflow-hidden"
+            className="relative z-10 flex flex-col w-[90vw] h-[90vh] max-w-5xl bg-white rounded-2xl border border-black/[0.08] overflow-hidden shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            {/* Modal header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] flex-shrink-0">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-black/[0.07]">
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-2xl">{FILE_ICONS[previewFile.file_type]}</span>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-200 truncate">{previewFile.name}</p>
-                  <p className="text-xs text-slate-600">{formatBytes(previewFile.size)}</p>
+                  <p className="text-sm font-medium text-[#333] truncate">{previewFile.name}</p>
+                  <p className="text-xs text-[#aaa]">{formatBytes(previewFile.size)}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2">
                 <button onClick={() => downloadFile(previewFile)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 transition-colors text-xs font-medium">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f5f5f5] text-[#333] hover:bg-[#eee] transition-colors text-xs font-medium border border-black/[0.07]">
                   <Download className="w-3.5 h-3.5" /> Download
                 </button>
                 <button onClick={closePreview}
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/[0.05] transition-colors">
+                  className="p-1.5 rounded-lg text-[#aaa] hover:text-[#333] hover:bg-[#f5f5f5] transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
-
-            {/* Modal body — uses renderPreviewBody() for clean separation */}
-            <div className="flex-1 overflow-hidden flex items-center justify-center bg-black/20">
+            <div className="flex-1 overflow-hidden flex items-center justify-center bg-[#fafafa]">
               {renderPreviewBody()}
             </div>
           </div>

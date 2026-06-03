@@ -8,18 +8,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, { data: files }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase.from("files").select("size").eq("user_id", user.id).eq("is_deleted", false),
+  ]);
+
+  const realStorageUsed = (files ?? []).reduce((sum: number, f: any) => sum + (f.size ?? 0), 0);
+  const profileWithRealStorage = profile ? { ...profile, storage_used: realStorageUsed } : profile;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#070710]">
-      <Sidebar profile={profile} />
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <TopBar user={user} profile={profile} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+    <div className="flex h-screen overflow-hidden bg-white">
+      <Sidebar profile={profileWithRealStorage} />
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-white">
+        <TopBar user={user} profile={profileWithRealStorage} />
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-white">
           {children}
         </main>
       </div>

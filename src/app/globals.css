@@ -13,78 +13,78 @@
 * { box-sizing: border-box; }
 
 body {
-  background: #070710;
-  color: #f1f5f9;
+  background: #ffffff;
+  color: #0a0a0a;
   font-family: 'Space Grotesk', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ===================== GLASS ===================== */
 .glass {
-  background: rgba(255,255,255,0.025);
+  background: rgba(0,0,0,0.03);
   backdrop-filter: blur(20px);
 }
 
 /* ===================== SIDEBAR ITEMS ===================== */
 .sidebar-item {
-  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500
-         hover:text-slate-200 hover:bg-white/[0.04] transition-all cursor-pointer
-         font-medium w-full;
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/50
+         hover:text-white hover:bg-white/[0.06] transition-all cursor-pointer
+         font-bold w-full;
 }
 .sidebar-item.active {
-  @apply text-white bg-white/[0.07] border border-white/[0.06];
+  @apply text-[#0a0a0a] bg-white font-bold;
 }
 
 /* ===================== INPUT ===================== */
 .input-field {
-  @apply w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]
-         text-slate-200 placeholder-slate-600 text-sm
-         focus:outline-none focus:border-brand-500/50 focus:bg-white/[0.06]
+  @apply w-full px-3 py-2.5 rounded-xl bg-[#1a1a1a] border border-[#222]
+         text-[#aaaaaa] placeholder-[#444] text-sm
+         focus:outline-none focus:border-brand-500/50 focus:bg-[#222]
          transition-all;
 }
 
 /* ===================== BUTTONS ===================== */
 .btn-primary {
-  @apply px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white
+  @apply px-4 py-2.5 rounded-xl bg-[#0a0a0a] hover:bg-[#222] text-white
          font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 /* ===================== FILE CARDS ===================== */
 .file-card {
-  @apply relative p-4 rounded-2xl border border-white/[0.05] bg-white/[0.02]
-         hover:border-white/[0.1] hover:bg-white/[0.04] cursor-pointer transition-all;
+  @apply relative p-4 rounded-2xl border border-black/[0.07] bg-white
+         hover:border-black/[0.16] hover:shadow-md cursor-pointer transition-all;
 }
 
 /* ===================== STAT CARD ===================== */
 .stat-card {
-  @apply glass rounded-2xl p-5 border border-white/[0.05];
+  @apply rounded-2xl p-5 border border-black/[0.07] bg-[#fafafa];
 }
 
 /* ===================== UPLOAD ZONE ===================== */
 .upload-zone {
-  @apply rounded-2xl border-2 border-dashed border-white/[0.08]
-         bg-white/[0.01] hover:border-brand-500/30 hover:bg-brand-500/[0.02] transition-all;
+  @apply rounded-2xl border-2 border-dashed border-black/[0.1]
+         bg-[#fafafa] hover:border-brand-500/30 hover:bg-brand-500/[0.02] transition-all;
 }
 
 /* ===================== BADGE ===================== */
 .badge {
   @apply inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-medium font-mono uppercase tracking-wide;
 }
-.badge-doc   { @apply bg-blue-500/15 text-blue-400; }
-.badge-image { @apply bg-green-500/15 text-green-400; }
-.badge-video { @apply bg-purple-500/15 text-purple-400; }
-.badge-pdf   { @apply bg-red-500/15 text-red-400; }
-.badge-audio { @apply bg-yellow-500/15 text-yellow-400; }
-.badge-archive { @apply bg-orange-500/15 text-orange-400; }
-.badge-other { @apply bg-slate-500/15 text-slate-400; }
+.badge-doc   { @apply bg-blue-500/10 text-blue-700; }
+.badge-image { @apply bg-green-500/10 text-green-700; }
+.badge-video { @apply bg-purple-500/10 text-purple-700; }
+.badge-pdf   { @apply bg-red-500/10 text-red-700; }
+.badge-audio { @apply bg-yellow-500/10 text-yellow-700; }
+.badge-archive { @apply bg-orange-500/10 text-orange-700; }
+.badge-other { @apply bg-slate-500/10 text-slate-600; }
 
 /* ===================== PROGRESS ===================== */
 .progress-bar {
-  @apply h-1.5 rounded-full bg-white/[0.06] overflow-hidden;
+  @apply h-1.5 rounded-full bg-[#222] overflow-hidden;
 }
 .progress-fill {
   @apply h-full rounded-full transition-all duration-700;
-  background: linear-gradient(90deg, #6366f1, #818cf8, #a78bfa);
+  background: linear-gradient(90deg, #ffffff, #aaaaaa);
 }
 
 /* ===================== TOAST ===================== */
@@ -95,10 +95,13 @@ body {
          animate-slide-up whitespace-nowrap;
 }
 .toast-success {
-  @apply bg-green-500/20 border-green-500/30 text-green-300;
+  @apply bg-green-500/20 border-green-500/30 text-green-700;
 }
 .toast-error {
-  @apply bg-red-500/20 border-red-500/30 text-red-300;
+  @apply bg-red-500/20 border-red-500/30 text-red-700;
+}
+.toast-info {
+  @apply bg-blue-500/20 border-blue-500/30 text-blue-700;
 }
 
 /* ===================== GLOW ===================== */
@@ -121,8 +124,8 @@ body {
 /* ===================== SCROLLBAR ===================== */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
 
 /* ===================== FONT DISPLAY ===================== */
 .font-display { font-family: 'Space Grotesk', sans-serif; }
@@ -130,15 +133,13 @@ body {
 
 /* ===================== GRADIENT TEXT ===================== */
 .gradient-text {
-  background: linear-gradient(135deg, #818cf8, #6366f1, #a78bfa);
+  background: linear-gradient(135deg, #0a0a0a, #444);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 /* ===================== MOBILE PADDING HELPER ===================== */
-/* Pages inside dashboard get proper top padding on mobile
-   because the hamburger button overlaps */
 @media (max-width: 1023px) {
   main > * {
     padding-top: 0 !important;

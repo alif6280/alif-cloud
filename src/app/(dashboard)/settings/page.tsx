@@ -53,37 +53,43 @@ export default function SettingsPage() {
   return (
     <div className="animate-fade-in max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-display font-bold text-white flex items-center gap-2">
-          <Settings className="w-6 h-6 text-brand-400" /> Settings
+        <h1 className="text-2xl font-display font-bold text-[#0a0a0a] flex items-center gap-2">
+          <Settings className="w-6 h-6 text-[#0a0a0a]" /> Settings
         </h1>
-        <p className="text-slate-600 text-sm mt-0.5">Manage your account</p>
+        <p className="text-[#aaa] text-sm mt-0.5">Manage your account</p>
       </div>
 
       <div className="space-y-4">
         {/* Profile */}
-        <div className="glass rounded-2xl p-6 border border-white/[0.05]">
+        <div className="rounded-2xl p-6 border border-black/[0.08] bg-[#fafafa]">
           <div className="flex items-center gap-2 mb-5">
-            <User className="w-4 h-4 text-brand-400" />
-            <h2 className="text-sm font-display font-semibold text-white">Profile</h2>
+            <User className="w-4 h-4 text-[#555]" />
+            <h2 className="text-sm font-display font-semibold text-[#0a0a0a]">Profile</h2>
           </div>
 
           <div className="flex items-center gap-4 mb-5">
-            <div className="w-14 h-14 rounded-2xl bg-brand-600/20 border border-brand-500/30 flex items-center justify-center text-brand-300 text-lg font-bold font-display glow">
+            <div className="w-14 h-14 rounded-2xl bg-[#0a0a0a] flex items-center justify-center text-white text-lg font-bold font-display">
               {initials}
             </div>
             <div>
-              <p className="text-white font-medium">{fullName || "Your Name"}</p>
-              <p className="text-slate-600 text-xs">{profile?.email}</p>
-              <span className="badge badge-doc mt-1">{profile?.role}</span>
+              <p className="text-[#0a0a0a] font-semibold">{fullName || "Your Name"}</p>
+              <p className="text-[#aaa] text-xs mt-0.5">{profile?.email}</p>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-medium bg-black/[0.06] text-[#555] mt-1 uppercase tracking-wide">
+                {profile?.role}
+              </span>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs text-slate-500 mb-1.5 font-medium uppercase tracking-wide">Full Name</label>
-            <input value={fullName} onChange={e => setFullName(e.target.value)}
-              placeholder="Your full name" className="input-field mb-4" />
+            <label className="block text-xs text-[#888] mb-1.5 font-semibold uppercase tracking-wide">Full Name</label>
+            <input
+              value={fullName}
+              onChange={e => setFullName(e.target.value)}
+              placeholder="Your full name"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-black/[0.1] text-[#0a0a0a] placeholder-[#bbb] text-sm focus:outline-none focus:border-black/25 transition-all mb-4"
+            />
             <button onClick={saveProfile} disabled={saving}
-              className="btn-primary flex items-center gap-2 text-sm py-2 px-4">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0a0a0a] text-white text-sm font-semibold hover:bg-[#222] transition-all disabled:opacity-50">
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               Save Changes
             </button>
@@ -91,10 +97,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Password */}
-        <div className="glass rounded-2xl p-6 border border-white/[0.05]">
+        <div className="rounded-2xl p-6 border border-black/[0.08] bg-[#fafafa]">
           <div className="flex items-center gap-2 mb-5">
-            <Lock className="w-4 h-4 text-brand-400" />
-            <h2 className="text-sm font-display font-semibold text-white">Change Password</h2>
+            <Lock className="w-4 h-4 text-[#555]" />
+            <h2 className="text-sm font-display font-semibold text-[#0a0a0a]">Change Password</h2>
           </div>
           <div className="relative mb-4">
             <input
@@ -102,34 +108,38 @@ export default function SettingsPage() {
               value={newPassword}
               onChange={e => setNewPassword(e.target.value)}
               placeholder="New password (min 8 chars)"
-              className="input-field pr-10"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-black/[0.1] text-[#0a0a0a] placeholder-[#bbb] text-sm focus:outline-none focus:border-black/25 transition-all pr-10"
             />
             <button onClick={() => setShowPass(!showPass)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#bbb] hover:text-[#888] transition-colors">
               {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           <button onClick={changePassword} disabled={saving}
-            className="btn-primary flex items-center gap-2 text-sm py-2 px-4">
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0a0a0a] text-white text-sm font-semibold hover:bg-[#222] transition-all disabled:opacity-50">
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Shield className="w-3.5 h-3.5" />}
             Update Password
           </button>
         </div>
 
         {/* Danger zone */}
-        <div className="rounded-2xl p-6 border border-red-500/20 bg-red-500/[0.03]">
+        <div className="rounded-2xl p-6 border border-red-200 bg-red-50">
           <div className="flex items-center gap-2 mb-3">
-            <Bell className="w-4 h-4 text-red-400" />
-            <h2 className="text-sm font-display font-semibold text-red-400">Danger Zone</h2>
+            <Bell className="w-4 h-4 text-red-500" />
+            <h2 className="text-sm font-display font-semibold text-red-600">Danger Zone</h2>
           </div>
-          <p className="text-slate-600 text-xs mb-4">Deleting your account is permanent and cannot be undone. All files will be lost.</p>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all text-sm font-medium">
+          <p className="text-[#888] text-xs mb-4">Deleting your account is permanent and cannot be undone. All files will be lost.</p>
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-200 text-red-600 hover:bg-red-500/20 transition-all text-sm font-semibold">
             Delete Account
           </button>
         </div>
       </div>
 
-      {toast && <div className={`toast toast-${toast.type}`}>{toast.msg}</div>}
+      {toast && (
+        <div className={`toast ${toast.type === "success" ? "toast-success" : "toast-error"}`}>
+          <span>{toast.type === "success" ? "✓" : "✕"}</span> {toast.msg}
+        </div>
+      )}
     </div>
   );
 }

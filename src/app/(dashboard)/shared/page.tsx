@@ -70,34 +70,34 @@ export default function SharedPage() {
   return (
     <div className="animate-fade-in">
       <div className="mb-6">
-        <h1 className="text-2xl font-display font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-display font-bold text-[#0a0a0a] flex items-center gap-2">
           <Share2 className="w-6 h-6 text-green-400" /> Shared Links
         </h1>
-        <p className="text-slate-600 text-sm mt-0.5">{links.length} active share links</p>
+        <p className="text-[#aaa] text-sm mt-0.5">{links.length} active share links</p>
       </div>
 
       {links.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 upload-zone">
-          <Share2 className="w-12 h-12 text-slate-600 mb-3" />
-          <p className="text-slate-400 font-display font-semibold">No shared links</p>
-          <p className="text-slate-600 text-sm mt-1">Share files from My Files to see links here</p>
+          <Share2 className="w-12 h-12 text-[#aaa] mb-3" />
+          <p className="text-[#888] font-display font-semibold">No shared links</p>
+          <p className="text-[#aaa] text-sm mt-1">Share files from My Files to see links here</p>
         </div>
       ) : (
         <div className="space-y-2">
           {links.map(link => (
-            <div key={link.id} className={`flex items-center gap-4 p-4 glass rounded-xl border transition-all group ${isExpired(link.expires_at) ? "border-red-500/20 opacity-60" : "border-white/[0.04] hover:border-white/[0.08]"}`}>
+            <div key={link.id} className={`flex items-center gap-4 p-4 glass rounded-xl border transition-all group ${isExpired(link.expires_at) ? "border-red-500/20 opacity-60" : "border-white/[0.04] hover:border-black/[0.08]"}`}>
               <span className="text-2xl">{FILE_ICONS[link.files?.file_type ?? "other"]}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-300 font-medium truncate">{link.files?.name ?? "Unknown file"}</p>
+                <p className="text-sm text-[#333] font-medium truncate">{link.files?.name ?? "Unknown file"}</p>
                 <div className="flex items-center gap-3 mt-0.5">
-                  <span className="text-xs text-slate-600">Created {formatDate(link.created_at)}</span>
+                  <span className="text-xs text-[#aaa]">Created {formatDate(link.created_at)}</span>
                   {link.expires_at && (
-                    <span className={`flex items-center gap-1 text-xs ${isExpired(link.expires_at) ? "text-red-400" : "text-slate-600"}`}>
+                    <span className={`flex items-center gap-1 text-xs ${isExpired(link.expires_at) ? "text-red-400" : "text-[#aaa]"}`}>
                       <Clock className="w-3 h-3" />
                       {isExpired(link.expires_at) ? "Expired" : `Expires ${formatDate(link.expires_at)}`}
                     </span>
                   )}
-                  <span className="text-xs text-slate-600">{link.use_count} uses</span>
+                  <span className="text-xs text-[#aaa]">{link.use_count} uses</span>
                 </div>
               </div>
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

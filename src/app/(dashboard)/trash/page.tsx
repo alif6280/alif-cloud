@@ -95,10 +95,10 @@ export default function TrashPage() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-display font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-display font-bold text-[#0a0a0a] flex items-center gap-2">
             <Trash2 className="w-6 h-6 text-red-400" /> Trash
           </h1>
-          <p className="text-slate-600 text-sm mt-0.5">Files are auto-deleted after 30 days</p>
+          <p className="text-[#aaa] text-sm mt-0.5">Files are auto-deleted after 30 days</p>
         </div>
         {files.length > 0 && (
           <button onClick={emptyTrash}
@@ -110,18 +110,18 @@ export default function TrashPage() {
 
       {files.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 upload-zone">
-          <Trash2 className="w-12 h-12 text-slate-600 mb-3" />
-          <p className="text-slate-400 font-display font-semibold">Trash is empty</p>
-          <p className="text-slate-600 text-sm mt-1">Deleted files will appear here</p>
+          <Trash2 className="w-12 h-12 text-[#aaa] mb-3" />
+          <p className="text-[#888] font-display font-semibold">Trash is empty</p>
+          <p className="text-[#aaa] text-sm mt-1">Deleted files will appear here</p>
         </div>
       ) : (
         <div className="space-y-2">
           {files.map(file => (
-            <div key={file.id} className="flex items-center gap-4 p-4 glass rounded-xl border border-white/[0.04] hover:border-white/[0.08] transition-all group">
+            <div key={file.id} className="flex items-center gap-4 p-4 glass rounded-xl border border-white/[0.04] hover:border-black/[0.08] transition-all group">
               <span className="text-2xl">{FILE_ICONS[file.file_type]}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-300 font-medium truncate">{file.name}</p>
-                <p className="text-xs text-slate-600 mt-0.5">{formatBytes(file.size)} · Deleted {file.deleted_at ? formatDate(file.deleted_at) : "recently"}</p>
+                <p className="text-sm text-[#333] font-medium truncate">{file.name}</p>
+                <p className="text-xs text-[#aaa] mt-0.5">{formatBytes(file.size)} · Deleted {file.deleted_at ? formatDate(file.deleted_at) : "recently"}</p>
               </div>
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => restore(file)}

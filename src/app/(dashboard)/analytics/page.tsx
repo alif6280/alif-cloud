@@ -57,7 +57,7 @@ export default function AnalyticsPage() {
   });
 
   const totalDownloads = files.reduce((s, f) => s + (f.download_count || 0), 0);
-  const used = profile?.storage_used ?? 0;
+  const used = files.reduce((s, f) => s + f.size, 0);
   const quota = profile?.storage_quota ?? 1073741824;
   const pct = Math.min((used / quota) * 100, 100);
 
@@ -71,10 +71,10 @@ export default function AnalyticsPage() {
   return (
     <div className="animate-fade-in space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-display font-bold text-[#0a0a0a] flex items-center gap-2">
           <BarChart2 className="w-6 h-6 text-brand-400" /> Analytics
         </h1>
-        <p className="text-slate-600 text-sm mt-0.5">Your storage insights</p>
+        <p className="text-[#aaa] text-sm mt-0.5">Your storage insights</p>
       </div>
 
       {/* Stat cards */}
@@ -82,12 +82,12 @@ export default function AnalyticsPage() {
         {statCards.map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="stat-card" style={{ ["--glow" as string]: color }}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-slate-600 font-medium uppercase tracking-wide">{label}</span>
+              <span className="text-xs text-[#aaa] font-medium uppercase tracking-wide">{label}</span>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}20` }}>
                 <Icon className="w-4 h-4" style={{ color }} />
               </div>
             </div>
-            <div className="text-2xl font-display font-bold text-white">{value}</div>
+            <div className="text-2xl font-display font-bold text-[#0a0a0a]">{value}</div>
           </div>
         ))}
       </div>
@@ -95,8 +95,8 @@ export default function AnalyticsPage() {
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Bar chart */}
-        <div className="glass rounded-2xl p-5 border border-white/[0.05]">
-          <h3 className="text-sm font-display font-semibold text-white mb-4">Uploads — Last 7 Days</h3>
+        <div className="glass rounded-2xl p-5 border border-black/[0.07]">
+          <h3 className="text-sm font-display font-semibold text-[#0a0a0a] mb-4">Uploads — Last 7 Days</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={last7}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
@@ -109,10 +109,10 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Pie chart */}
-        <div className="glass rounded-2xl p-5 border border-white/[0.05]">
-          <h3 className="text-sm font-display font-semibold text-white mb-4">File Type Breakdown</h3>
+        <div className="glass rounded-2xl p-5 border border-black/[0.07]">
+          <h3 className="text-sm font-display font-semibold text-[#0a0a0a] mb-4">File Type Breakdown</h3>
           {pieData.length === 0 ? (
-            <div className="flex items-center justify-center h-[200px] text-slate-600 text-sm">No files yet</div>
+            <div className="flex items-center justify-center h-[200px] text-[#aaa] text-sm">No files yet</div>
           ) : (
             <div className="flex items-center gap-4">
               <ResponsiveContainer width="60%" height={200}>
@@ -129,8 +129,8 @@ export default function AnalyticsPage() {
                 {pieData.map(e => (
                   <div key={e.name} className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: TYPE_COLORS[e.name] }} />
-                    <span className="text-xs text-slate-400 capitalize flex-1">{e.name}</span>
-                    <span className="text-xs text-slate-500 font-medium">{e.value}</span>
+                    <span className="text-xs text-[#888] capitalize flex-1">{e.name}</span>
+                    <span className="text-xs text-[#aaa] font-medium">{e.value}</span>
                   </div>
                 ))}
               </div>
@@ -140,10 +140,10 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Storage gauge */}
-      <div className="glass rounded-2xl p-5 border border-white/[0.05]">
+      <div className="glass rounded-2xl p-5 border border-black/[0.07]">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-display font-semibold text-white">Storage Usage</h3>
-          <span className="text-xs text-slate-500">{pct.toFixed(1)}% used</span>
+          <h3 className="text-sm font-display font-semibold text-[#0a0a0a]">Storage Usage</h3>
+          <span className="text-xs text-[#aaa]">{pct.toFixed(1)}% used</span>
         </div>
         <div className="h-3 rounded-full bg-white/[0.05] overflow-hidden">
           <div className="h-full rounded-full transition-all duration-700" style={{
@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
             background: pct > 80 ? "linear-gradient(90deg,#f59e0b,#ef4444)" : "linear-gradient(90deg,#6366f1,#818cf8,#a78bfa)"
           }} />
         </div>
-        <div className="flex justify-between mt-2 text-xs text-slate-600">
+        <div className="flex justify-between mt-2 text-xs text-[#aaa]">
           <span>{formatBytes(used)} used</span>
           <span>{formatBytes(quota - used)} free</span>
           <span>{formatBytes(quota)} total</span>
